@@ -10,6 +10,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Entity
 @Table(name = "tb_task")
@@ -23,9 +24,21 @@ public class Task {
 	private String description;
 	
 	private Boolean done;
+		
+	private Long tasklist;
 	
+ 
 	public Task() {		
 	}
+	
+	public Task(String description, Boolean done, TaskList tasklist) {
+		super();		
+		this.description = description;
+		this.done = done;
+		this.tasklist = tasklist.getId();
+	}
+
+
 
 	public Long getId() {
 		return id;
@@ -50,5 +63,20 @@ public class Task {
 	public void setDone(Boolean done) {
 		this.done = done;
 	}
+
+
+
+	public Long getTasklist() {
+		return tasklist;
+	}
+
+
+
+	public void setTasklist(Long tasklist) {
+		this.tasklist = tasklist;
+	}
+
+	
+	
 				
 }

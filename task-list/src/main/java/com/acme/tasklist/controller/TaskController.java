@@ -41,9 +41,7 @@ public class TaskController {
 	
 	@PostMapping
 	public ResponseEntity<Task> insert(@RequestBody Task obj) {
-		obj = service.insert(obj);			
-		System.out.println(obj.getDescription());
-		System.out.println(obj.getDone());
+		obj = service.insert(obj);				
 		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
 				.buildAndExpand(obj.getId()).toUri();
 		return ResponseEntity.created(uri).body(obj);

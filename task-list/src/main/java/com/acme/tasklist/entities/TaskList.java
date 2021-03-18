@@ -11,18 +11,23 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import lombok.Getter;
+import lombok.Setter;
+
 @Entity
 @Table(name = "tb_task_list")
 public class TaskList {
 	
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.AUTO)	
 	private Long id;
 	
 	private String description;
 	
 	@OneToMany(cascade = CascadeType.ALL)
-	@JoinColumn(name = "tl_fid")
+	@JoinColumn(name = "tasklist")
 	private List<Task> tasklist;
 	
 	public TaskList() {		
