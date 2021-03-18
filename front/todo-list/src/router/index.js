@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import VueRouter, { RouteConfig } from 'vue-router'
+import VueRouter from 'vue-router'
 import TodoList from '@/views/todo-list/TodoList.vue';
 import Author from '@/views/author/Author.vue';
 
