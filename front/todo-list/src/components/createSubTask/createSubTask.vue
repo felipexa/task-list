@@ -3,12 +3,12 @@
     <Dialog
       :visible.sync="displayModal"
       :style="{ width: '60vw' }"
-      header="Adicionar  Sub-Task"
+      header="Adicionar  Tarefa"
       modal
     >
       <panel class="px-5 pb-5 pt-3">
         <template #header>
-          <h2>Criar Sub-Task</h2>
+          <h2>Criar Tarefa</h2>
         </template>
         <div class="row py-4 d-flex align-items-end">
           <div class="col-md-3">
@@ -63,6 +63,7 @@ export default {
       },
       set(value) {
         this.$emit("update:visible", value);
+        this.selectedDescription = "";
       },
     },
   },
@@ -80,9 +81,10 @@ export default {
         .then(() => {
           this.$toast.add({
             severity: "success",
-            detail: "SubTask adicionado com sucesso!!",
+            detail: "Tarefa adicionada com sucesso!!",
             life: 3000,
           });
+          this.selectedDescription = "";
           this.displayModal = false;
           this.$emit("newSubTask");
         })

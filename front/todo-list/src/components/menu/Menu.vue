@@ -4,7 +4,7 @@
       <ul class="nav">
         <li class="nav-item mx-3 d-flex align-items-center">
           <font-awesome-icon icon="tasks" class="mr-2 icons" />
-          <router-link to="/"> Tasks </router-link>
+          <router-link to="/"> Tarefas </router-link>
         </li>
         <li class="nav-item mx-3 d-flex align-items-center">
           <font-awesome-icon icon="user-ninja" class="mr-2 icons" />
@@ -31,7 +31,7 @@
       <div class="d-flex align-items-center">
         <font-awesome-icon icon="tasks" class="mr-2 icons icon-aside" />
         <router-link to="/">
-          <li @click="visible = false">Tasks</li></router-link
+          <li @click="visible = false">Tarefas</li></router-link
         >
       </div>
       <div class="d-flex align-items-center">

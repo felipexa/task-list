@@ -8,7 +8,7 @@
         <div class="item col-3">          
           <InputText
             class="w-100"
-            v-model="selectedDescription"
+            v-model="listDescription"
             placeholder="Nome da Lista..."
           />
         </div>
@@ -18,7 +18,7 @@
             data-test="createTask"
             label="Criar"
             @click="createTask"
-            :disabled="!selectedDescription"                       
+            :disabled="!listDescription"                       
           />
         </div>
       </div>
@@ -109,7 +109,7 @@ export default {
   data() {
     return {
       dataTable: [],
-      selectedDescription: "",
+      listDescription: "",
       itemEdit: [],
       visible: false,
       visibleSubTask: false,
@@ -120,6 +120,12 @@ export default {
     ...mapMutations(["handleLoading"]),
     newSubTask() {
       getTaskList()
+        .then((resp) => (this.dataTable = resp))
+        .catch((error) => console.log(error))
+        .finally(() => this.handleLoading(false));
+    },
+    reloadTable() {
+       getTaskList()
         .then((resp) => (this.dataTable = resp))
         .catch((error) => console.log(error))
         .finally(() => this.handleLoading(false));
@@ -138,36 +144,34 @@ export default {
       if (task.done) {
         this.$toast.add({
           severity: "success",
-          detail: "SubTask concluída!!",
+          detail: "Tarefa concluída!!",
           life: 3000,
         });
       } else {
         this.$toast.add({
           severity: "warn",
-          detail: "SubTask em andamento!!",
+          detail: "Tarefa em andamento!!",
           life: 3000,
         });
       }
     },
-    clear() {    
-      this.selectedDescription = "";
-    },
     createTask() {
       this.handleLoading(true);
-      addTaskList({ description: this.selectedDescription })
-        .then((resp) => {        
-          this.dataTable.push(resp);
+      const newTaskList = { description: this.listDescription }
+      addTaskList(newTaskList)
+        .then(() => {                  
           this.$toast.add({
             severity: "success",
-            detail: "Task adicionado com sucesso!!",
+            detail: "Lista adicionada com sucesso!!",
             life: 3000,
-          }); 
-          this.clear();                       
+          });                                
+          this.listDescription = "";   
+          this.reloadTable();
         })
         .catch(() => {
           this.$toast.add({
             severity: "error",
-            detail: "Erro ao adicionar task!!",
+            detail: "Erro ao adicionar Lista!!",
             life: 3000,
           });
         })
@@ -180,14 +184,14 @@ export default {
           item.tasklist.splice(i, 1);
           this.$toast.add({
             severity: "success",
-            detail: "Task removida com sucesso!!",
+            detail: "Tarefa removida com sucesso!!",
             life: 3000,
           });
         })
         .catch(() => {
           this.$toast.add({
             severity: "error",
-            detail: "Erro ao remover task!!",
+            detail: "Erro ao remover tarefa!!",
             life: 3000,
           });
         })
