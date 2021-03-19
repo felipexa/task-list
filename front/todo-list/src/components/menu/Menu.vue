@@ -57,42 +57,42 @@
 </template>
 <script>
 export default {
-   data() {
+  data() {
     return {
-      visible: false ,
+      visible: false,
     };
   },
-}
+};
 </script>
 
-<style lang="scss">
+<style>
 .menu {
   padding-bottom: 100px;
-  .icons {
-    color: #e2b874;
-  }
-  .open-menu {
-    position: fixed;
-    top: 60px;
-    z-index: 5;
-  }
-  &__horizontal {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 60px;
-    width: 100%;
-    background: black;
-    position: fixed;
-    z-index: 5;
-    li {
-      font-size: 16px;
-      color: #ffff;
-      font-family: "SF Pro Display SemiBold";
-      a {
-        color: #ffff;
-      }
-    }
-  }
+}
+.menu .icons {
+  color: #e2b874;
+}
+.menu .open-menu {
+  position: fixed;
+  top: 60px;
+  z-index: 5;
+}
+.menu__horizontal {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 60px;
+  width: 100%;
+  background: black;
+  position: fixed;
+  z-index: 5;
+}
+.menu__horizontal li {
+  font-size: 16px;
+  color: #ffff;
+  font-family: "SF Pro Display SemiBold";
+}
+.menu__horizontal li a {
+  color: #ffff;
 }
 </style>

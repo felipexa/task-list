@@ -1,6 +1,6 @@
 <template>
   <div class="author">
-    <div class="author__content text-center">
+    <div class="text-center">
       <h1>Felipe Xavier Assunção</h1>
       <h2>Desenvolvedor Full Stack</h2>
       <h3>Java | Spring Boot | SQL | HTML | CSS | Javascript | Vue.js</h3>
@@ -8,7 +8,7 @@
   </div>
 </template>
 
-<style lang="scss" scoped>
+<style scoped>
 .author {
   display: flex;
   justify-content: center;

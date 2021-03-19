@@ -2,15 +2,14 @@
   <div class="todo-list">
     <panel>
       <template #header>
-        <h2>Criar Task</h2>
+        <h2>Criar lista de tarefas</h2>
       </template>
-      <div class="todo-list__add row py-2">
-        <div class="item col-3">
-          <h5>Descrição</h5>
+      <div class="row py-2 d-flex align-items-end">
+        <div class="item col-3">          
           <InputText
             class="w-100"
             v-model="selectedDescription"
-            placeholder="Descrição"
+            placeholder="Nome da Lista..."
           />
         </div>
 
@@ -19,65 +18,68 @@
             data-test="createTask"
             label="Criar"
             @click="createTask"
-            :disabled="!selectedDescription"
+            :disabled="!selectedDescription"                       
           />
         </div>
       </div>
     </panel>
     <div class="py-4">
       <div
-        class="todo-list__content border my-3 p-3"
+        class="todo-list__content border my-3 pl-3 py-3"
         v-for="(item, index) in dataTable"
         :key="`${index} A`"
       >
-        <h5>TASK</h5>
+        <h5>LISTA</h5>
         <hr />
         <div class="d-flex align-items-center">
-          <div class="item mx-4">
-            <h5>Descrição</h5>
-            <label>{{ item.description }}</label>
+          <div class="item">
+            <h5>{{ item.description }}</h5>
           </div>
           <div class="item" @click="openCreateModal(item)">
             <font-awesome-icon
               icon="plus-square"
               class="ml-3"
-              style="width: 1.3rem; height: 1.3rem"
+              style="width: 1.3rem; height: 1.3rem; color: green"
             />
           </div>
         </div>
         <hr />
-        <h5>SUBTASKS</h5>
-        <hr />
-        <div
-          v-for="(el, index) in item.tasklist"
-          :key="`${index} A`"
-          class="d-flex align-items-center pl-2"
-        >
-          <div class="item mx-4">
-            <h5>Descrição</h5>
-            <label>{{ el.description }}</label>
-          </div>
-          <div class="item">
-            <font-awesome-icon
-              icon="trash-alt"
-              class="ml-2 trash"
-              style="width: 1.3rem; height: 1.3rem"
-            />
-            <font-awesome-icon
-              icon="check-square"
-              class="mx-2 trash"
-              style="width: 1.3rem; height: 1.3rem"
-            />
-          </div>
+        <div v-if="item.tasklist.length > 0">
+          <h5>TAREFAS</h5>
+          <hr />
+          <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">Id</th>
+                <th scope="col">Descrição</th>
+              </tr>
+            </thead>
+            <tbody v-for="(el, i) in item.tasklist" :key="`${i} A`">
+              <tr>
+                <th scope="row">{{ i + 1 }}</th>
+                <td>{{ el.description }}</td>
+                <td>
+                  <font-awesome-icon
+                    icon="trash-alt"
+                    class="ml-2 trash"
+                    style="width: 1.3rem; height: 1.3rem; color: red"
+                    @click="removeTask(el, item, i)"
+                  />
+                  <font-awesome-icon
+                    icon="check-square"
+                    class="mx-2 trash"
+                    :class="el.done ? 'green' : 'not-conclued'"
+                    style="width: 1.3rem; height: 1.3rem"
+                    @click="markConclued(el)"
+                  />
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
 
-    <EditTask
-      :visible.sync="visible"
-      :data="itemEdit"
-      @update="updateDataTable"
-    />
     <CreateSubTask
       :visible.sync="visibleSubTask"
       :task="taskSelected"
@@ -91,16 +93,18 @@ import {
   getTaskList,
   addTaskList,
   deleteTask,
-  editStatus,
+  updateTask,
 } from "./service/service";
-import EditTask from "@/components/editTask/EditTask.vue";
 import CreateSubTask from "@/components/createSubTask/createSubTask.vue";
+import { mapMutations } from "vuex";
 export default {
-  components: { EditTask, CreateSubTask },
+  components: { CreateSubTask },
   mounted() {
+    this.handleLoading(true);
     getTaskList()
       .then((resp) => (this.dataTable = resp))
-      .catch((error) => console.log(error));
+      .catch((error) => console.log(error))
+      .finally(() => this.handleLoading(false));
   },
   data() {
     return {
@@ -113,10 +117,12 @@ export default {
     };
   },
   methods: {
-    newSubTask(newTask) {
-      console.log(newTask);
-      const findIndex = this.data.findIndex((item) => item.id === newTask.id);
-      this.dataTable[findIndex].tasklist.push(newTask);
+    ...mapMutations(["handleLoading"]),
+    newSubTask() {
+      getTaskList()
+        .then((resp) => (this.dataTable = resp))
+        .catch((error) => console.log(error))
+        .finally(() => this.handleLoading(false));
     },
     openCreateModal(task) {
       this.visibleSubTask = true;
@@ -126,42 +132,37 @@ export default {
       const indexTask = this.dataTable.findIndex((task) => task.id === item.id);
       this.dataTable.splice(indexTask, 1, item);
     },
-    editDocument(task) {
-      this.visible = true;
-      this.itemEdit = task;
-    },
     markConclued(task) {
-      const indexTask = this.dataTable.findIndex((item) => item.id === task.id);
-      editStatus(task.id, { status: "Concluido" })
-        .then(() => {
-          this.dataTable[indexTask].status = "Concluido";
-          this.$toast.add({
-            severity: "success",
-            detail: "Task movida para o status concluído!!",
-            life: 3000,
-          });
-        })
-        .catch(() => {
-          this.$toast.add({
-            severity: "error",
-            detail: "Erro ao mudar status da task!!",
-            life: 3000,
-          });
+      task.done = !task.done;
+      updateTask(task.id, {done: task.done});
+      if (task.done) {
+        this.$toast.add({
+          severity: "success",
+          detail: "SubTask concluída!!",
+          life: 3000,
         });
+      } else {
+        this.$toast.add({
+          severity: "warn",
+          detail: "SubTask em andamento!!",
+          life: 3000,
+        });
+      }
     },
-    clear() {
+    clear() {    
       this.selectedDescription = "";
     },
     createTask() {
+      this.handleLoading(true);
       addTaskList({ description: this.selectedDescription })
-        .then((resp) => {
+        .then((resp) => {        
           this.dataTable.push(resp);
           this.$toast.add({
             severity: "success",
             detail: "Task adicionado com sucesso!!",
             life: 3000,
-          });
-          this.clear();
+          }); 
+          this.clear();                       
         })
         .catch(() => {
           this.$toast.add({
@@ -169,13 +170,14 @@ export default {
             detail: "Erro ao adicionar task!!",
             life: 3000,
           });
-        });
+        })
+        .finally(() => this.handleLoading(false));
     },
-    removeTask(task) {
-      const indexTask = this.dataTable.findIndex((item) => item.id === task.id);
+    removeTask(task, item, i) {
+      this.handleLoading(true);
       deleteTask(task.id)
         .then(() => {
-          this.dataTable.splice(indexTask, 1);
+          item.tasklist.splice(i, 1);
           this.$toast.add({
             severity: "success",
             detail: "Task removida com sucesso!!",
@@ -185,10 +187,11 @@ export default {
         .catch(() => {
           this.$toast.add({
             severity: "error",
-            detail: "Erro ao adicionar task!!",
+            detail: "Erro ao remover task!!",
             life: 3000,
           });
-        });
+        })
+        .finally(() => this.handleLoading(false));
     },
   },
 };
@@ -200,5 +203,11 @@ h2 {
 }
 .border {
   border: 1px solid gray;
+}
+.not-conclued {
+  color: rgba(59, 10, 10, 0.288);
+}
+.green {
+  color: green;
 }
 </style>

@@ -3,31 +3,25 @@
     <Dialog
       :visible.sync="displayModal"
       :style="{ width: '60vw' }"
-      header="Adicionar  SubTask"
+      header="Adicionar  Sub-Task"
       modal
     >
-      <panel>
+      <panel class="px-5 pb-5 pt-3">
         <template #header>
-          <h2>Criar SubTask</h2>
+          <h2>Criar Sub-Task</h2>
         </template>
-        <div class="todo-list__add row py-2">
-          <div class="item col-3">
+        <div class="row py-4 d-flex align-items-end">
+          <div class="col-md-3">
             <h5>Descrição</h5>
             <InputText
-              data-test="selectedDescription"
               class="w-100"
               v-model="selectedDescription"
               placeholder="Descrição"
             />
           </div>
-          <div class="item col-2">
+          <div class="col-md-4">
             <h5>Status</h5>
-            <Dropdown
-              :options="status"
-              class="w-100"
-              v-model="selectedStatus"
-              data-test="selectedStatus"
-            >
+            <Dropdown class="w-100" :options="status" v-model="selectedStatus">
               <template #option="slotProps">
                 {{ slotProps.option }}
               </template>
@@ -39,7 +33,7 @@
               </template>
             </Dropdown>
           </div>
-          <div class="col-2">
+          <div class="col-md-2">
             <Button label="Criar" @click="createTask" />
           </div>
         </div>
@@ -49,9 +43,10 @@
 </template>
 <script>
 import { addTask } from "@/views/todo-list/service/service.js";
+import { mapMutations } from "vuex";
 export default {
   mounted() {
-    this.selectedStatus = status[1];
+    this.selectedStatus = 'Não concluido'
   },
   props: ["visible", "task"],
   data() {
@@ -72,12 +67,14 @@ export default {
     },
   },
   methods: {
+    ...mapMutations(["handleLoading"]),
     createTask() {
+      this.handleLoading(true);
       const done = this.selectedStatus === this.status[0] ? true : false;
       const newTask = {
         description: this.selectedDescription,
         done,
-        taskList: this.task.id,
+        tasklist: this.task.id,
       };
       addTask(newTask)
         .then(() => {
@@ -86,19 +83,16 @@ export default {
             detail: "SubTask adicionado com sucesso!!",
             life: 3000,
           });
-          this.clear();
-          this.$emit("update:visible", false);
-          this.$emit("newSubTask", newTask);
+          this.displayModal = false;
+          this.$emit("newSubTask");
         })
-        .catch(() => {
-          this.$toast.add({
-            severity: "error",
-            detail: "Erro ao adicionar subtask!!",
-            life: 3000,
-          });
-        });
     },
   },
+  parseTask() {
+    return {
+      
+    }
+  }
 };
 </script>
 
